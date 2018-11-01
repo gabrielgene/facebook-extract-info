@@ -48,15 +48,21 @@ def get_gallery(gallery_name, browser, profile_name):
     browser.get("{}photos".format(p))
     time.sleep(1)
     remove_cta(browser)
-    list_of_galleries = browser.find_elements_by_css_selector(
+    list_of_galleries = []
+    list1 = browser.find_elements_by_css_selector(
         "#content_container > div > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(2) > div")
+    list2 = browser.find_elements_by_css_selector(
+        "#content_container > div > div:nth-child(2) > div > div > div > div:nth-child(2) > div ")
+    if len(list1) == 4:
+        list_of_galleries = list1
+    if len(list2) == 4:
+        list_of_galleries = list2
     limit = 1
     folder_type = ''
     for gallery in list_of_galleries:
         print("Getting gallery")
         hover = ActionChains(browser).move_to_element(gallery)
         hover.perform()
-        print(gallery.text)
         found = re.search(gallery_name, gallery.text)
         if found:
             hover = ActionChains(browser).move_to_element(gallery)
@@ -71,7 +77,7 @@ def get_gallery(gallery_name, browser, profile_name):
                 limit = 3
                 folder_type = 'profile'
             if gallery_name == "Fotos da linha do tempo":
-                limit = 30
+                limit = 3
             get_pictures_from_gallery(
                 browser, limit, profile_name, folder_type)
             break
@@ -80,12 +86,15 @@ def get_gallery(gallery_name, browser, profile_name):
 def get_pictures_from_gallery(browser, limit, profile_name, folder_type):
     print("Pictures from gallery... limit {}".format(limit))
     remove_cta(browser)
+    time.sleep(1)
     pictures = browser.find_elements_by_css_selector(
         "#content_container a img")
     for idx, picture in enumerate(pictures):
         if idx >= limit:
             break
         print("Getting img: {}".format(idx))
+        hover = ActionChains(browser).move_to_element(picture)
+        hover.perform()
         picture.click()
         time.sleep(3)
         try:
@@ -108,6 +117,7 @@ print("Instance browser")
 browser = webdriver.Chrome('./chromedriver', options=chrome_options)
 
 profiles = [
+    "https://www.facebook.com/mariaoficial00/",
     "https://www.facebook.com/KURADJ/",
     "https://www.facebook.com/djpetethazouk/",
     "https://www.facebook.com/djvascoamaral/"
@@ -123,9 +133,9 @@ for p in profiles:
     if not os.path.exists(profile_name):
         os.makedirs(profile_name)
 
-    # for gallery_name in galleries:
-    #     print("Getting {}".format(gallery_name))
-    #     get_gallery(gallery_name, browser, profile_name)
+    for gallery_name in galleries:
+        print("Getting {}".format(gallery_name))
+        get_gallery(gallery_name, browser, profile_name)
     get_about_info(browser, p, profile_name)
-    browser.close()
     print("--- %s seconds ---" % (time.time() - start_time))
+browser.close()
