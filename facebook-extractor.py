@@ -19,34 +19,6 @@ def remove_cta(browser):
         """, element)
 
 
-def get_pictures_from_gallery(browser, profile_name):
-    print("Pictures from gallery...")
-    img_el = browser.find_element_by_css_selector("#content_container img")
-    remove_cta(browser)
-    hover = ActionChains(browser).move_to_element(img_el)
-    hover.perform()
-    time.sleep(1)
-    img_el.click()
-    time.sleep(1)
-    remove_cta(browser)
-    pictures = browser.find_elements_by_css_selector(
-        "#content_container a img")
-    for idx, picture in enumerate(pictures):
-        if idx >= 30:
-            break
-        print("Getting img: {}".format(idx))
-        picture.click()
-        time.sleep(3)
-        try:
-            img_url = browser.find_element_by_css_selector(
-                ".spotlight").get_attribute("src")
-            save_img(img_url, str(idx), "./{}".format(profile_name))
-            browser.find_element_by_css_selector("._xlt").click()
-            time.sleep(1)
-        except Exception:
-            print("Erro on download picture")
-
-
 def get_profile_picture(browser):
     print("Profile image...")
     profile_image = browser.find_element_by_css_selector(
@@ -65,20 +37,67 @@ def get_about_info(browser, profile_url, profile_name):
     path = "./{}".format(profile_name)
     main_url = "https://www.facebook.com/pg/bandadexysoficial/about/"
     browser.get("{}about".format(profile_url))
-
-    print("Getting capa...")
-    try:
-        cover_url = browser.find_element_by_css_selector(
-            "#pagelet_page_cover img").get_attribute("src")
-        save_img(cover_url, 'cover', path)
-    except Exception:
-        print("Profile dont have img cover")
-
     print("Getting about data...")
     data = browser.find_element_by_css_selector("#content_container").text
     with open("{}/info.txt".format(path), 'w+') as handler:
         handler.write(data)
-    print(data)
+
+
+def get_gallery(gallery_name, browser, profile_name):
+    print("Getting  gallery {}".format(gallery_name))
+    browser.get("{}photos".format(p))
+    time.sleep(1)
+    remove_cta(browser)
+    list_of_galleries = browser.find_elements_by_css_selector(
+        "#content_container > div > div:nth-child(2) > div > div:nth-child(2) > div > div:nth-child(2) > div")
+    limit = 1
+    folder_type = ''
+    for gallery in list_of_galleries:
+        print("Getting gallery")
+        hover = ActionChains(browser).move_to_element(gallery)
+        hover.perform()
+        print(gallery.text)
+        found = re.search(gallery_name, gallery.text)
+        if found:
+            hover = ActionChains(browser).move_to_element(gallery)
+            hover.perform()
+            time.sleep(1)
+            gallery.click()
+            time.sleep(1)
+            if gallery_name == "Fotos da capa":
+                limit = 3
+                folder_type = 'cover'
+            if gallery_name == "Fotos do perfil":
+                limit = 3
+                folder_type = 'profile'
+            if gallery_name == "Fotos da linha do tempo":
+                limit = 30
+            get_pictures_from_gallery(
+                browser, limit, profile_name, folder_type)
+            break
+
+
+def get_pictures_from_gallery(browser, limit, profile_name, folder_type):
+    print("Pictures from gallery... limit {}".format(limit))
+    remove_cta(browser)
+    pictures = browser.find_elements_by_css_selector(
+        "#content_container a img")
+    for idx, picture in enumerate(pictures):
+        if idx >= limit:
+            break
+        print("Getting img: {}".format(idx))
+        picture.click()
+        time.sleep(3)
+        try:
+            img_url = browser.find_element_by_css_selector(
+                ".spotlight").get_attribute("src")
+            save_img(img_url, "{}_{}{}".format(folder_type, profile_name, str(idx)),
+                     "./{}".format(profile_name))
+            time.sleep(1)
+            browser.find_element_by_css_selector("._xlt").click()
+            time.sleep(1)
+        except Exception:
+            print("Erro on download picture")
 
 
 chrome_options = Options()
@@ -89,22 +108,24 @@ print("Instance browser")
 browser = webdriver.Chrome('./chromedriver', options=chrome_options)
 
 profiles = [
-    # "https://www.facebook.com/djpetethazouk/",
     "https://www.facebook.com/KURADJ/",
-    # "https://www.facebook.com/djvascoamaral/"
+    "https://www.facebook.com/djpetethazouk/",
+    "https://www.facebook.com/djvascoamaral/"
 ]
+
+galleries = ["Fotos da capa", "Fotos do perfil", "Fotos da linha do tempo"]
 
 for p in profiles:
     start_time = time.time()
+
     profile_name = re.search("\.com\/(\w+)\/", p).group(1)
     print("Getting profile: {}".format(p))
-    print("Getting gallery")
-    browser.get("{}photos".format(p))
-    time.sleep(1)
     if not os.path.exists(profile_name):
         os.makedirs(profile_name)
-    profile_image_url = get_profile_picture(browser)
-    save_img(profile_image_url, 'profile', "./{}".format(profile_name))
-    get_pictures_from_gallery(browser, profile_name)
+
+    # for gallery_name in galleries:
+    #     print("Getting {}".format(gallery_name))
+    #     get_gallery(gallery_name, browser, profile_name)
     get_about_info(browser, p, profile_name)
+    browser.close()
     print("--- %s seconds ---" % (time.time() - start_time))
