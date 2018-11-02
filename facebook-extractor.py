@@ -158,16 +158,19 @@ profiles = [
 galleries = ["Fotos da capa", "Fotos do perfil", "Fotos da linha do tempo"]
 
 for p in profiles:
-    start_time = time.time()
+    try
+        start_time = time.time()
 
-    profile_name = re.search("\.com\/(\w+.+)\/", p).group(1)
-    print("Getting profile: {}".format(p))
-    if not os.path.exists("profiles/{}".format(profile_name)):
-        os.makedirs("profiles/{}".format(profile_name))
+        profile_name = re.search("\.com\/(\w+.+)\/", p).group(1)
+        print("Getting profile: {}".format(p))
+        if not os.path.exists("profiles/{}".format(profile_name)):
+            os.makedirs("profiles/{}".format(profile_name))
 
-    for gallery_name in galleries:
-        print("Getting {}".format(gallery_name))
-        get_gallery(gallery_name, browser, profile_name)
-    get_about_info(browser, p, profile_name)
-    print("--- %s seconds ---" % (time.time() - start_time))
+        for gallery_name in galleries:
+            print("Getting {}".format(gallery_name))
+            get_gallery(gallery_name, browser, profile_name)
+        get_about_info(browser, p, profile_name)
+        print("--- %s seconds ---" % (time.time() - start_time))
+    except Exception:
+        print("Error on profile: {}".format(p))
 browser.close()
