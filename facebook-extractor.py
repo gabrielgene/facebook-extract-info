@@ -43,7 +43,6 @@ def get_all_galleries(browser):
     print("Getting all galleries")
     all_galleries_element = browser.find_element_by_css_selector(
         "div.rfloat > a")
-    import pdb; pdb.set_trace()
     link = all_galleries_element.get_attribute("href")
     browser.get(link)
     time.sleep(1)
