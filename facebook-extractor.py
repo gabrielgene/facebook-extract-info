@@ -42,7 +42,8 @@ def get_about_info(browser, profile_url, profile_name):
 def get_all_galleries(browser):
     print("Getting all galleries")
     all_galleries_element = browser.find_element_by_css_selector(
-        "div._ohf.rfloat > a")
+        "div.rfloat > a")
+    import pdb; pdb.set_trace()
     link = all_galleries_element.get_attribute("href")
     browser.get(link)
     time.sleep(1)
@@ -124,13 +125,13 @@ browser = webdriver.Chrome('./chromedriver', options=chrome_options)
 
 profiles = [
     # "https://www.facebook.com/djpetethazouk/",
-    "https://www.facebook.com/KURADJ/",
-    "https://www.facebook.com/djvascoamaral/",
-    "https://www.facebook.com/dj.XDirty/",
-    "https://www.facebook.com/thedjalext/",
-    "https://www.facebook.com/djpedro.pt/",
-    "https://www.facebook.com/djkaisert/",
-    "https://www.facebook.com/Dj-Thrasher-86162038072/",
+    # "https://www.facebook.com/KURADJ/",
+    # "https://www.facebook.com/djvascoamaral/",
+    # "https://www.facebook.com/dj.XDirty/",
+    # "https://www.facebook.com/thedjalext/",
+    # "https://www.facebook.com/djpedro.pt/",
+    # "https://www.facebook.com/djkaisert/",
+    # "https://www.facebook.com/Dj-Thrasher-86162038072/",
     "https://www.facebook.com/analodjicapt/",
     "https://www.facebook.com/paulsoir/",
     "https://www.facebook.com/HugoJardimDJ/",
