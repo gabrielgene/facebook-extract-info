@@ -158,7 +158,7 @@ profiles = [
 galleries = ["Fotos da capa", "Fotos do perfil", "Fotos da linha do tempo"]
 
 for p in profiles:
-    try
+    try:
         start_time = time.time()
 
         profile_name = re.search("\.com\/(\w+.+)\/", p).group(1)
