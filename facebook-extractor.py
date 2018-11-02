@@ -59,7 +59,7 @@ def get_gallery(gallery_name, browser, profile_name):
     remove_cta(browser)
     get_all_galleries(browser)
     list_of_galleries = browser.find_elements_by_css_selector(
-        "#u_0_l > div > div:nth-child(2) > div")
+        "#content_container > div > div:nth-child(2) > div > div > div > div:nth-child(2) > div")
     limit = 1
     folder_type = ''
     print(len(list_of_galleries))
