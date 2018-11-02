@@ -46,9 +46,10 @@ def get_all_galleries(browser):
     link = all_galleries_element.get_attribute("href")
     browser.get(link)
     time.sleep(1)
+    remove_cta(browser)
     browser.execute_script(
         "window.scrollTo(0, document.body.scrollHeight);")
-    remove_cta(browser)
+    time.sleep(3)
 
 
 def get_gallery(gallery_name, browser, profile_name):
@@ -74,13 +75,13 @@ def get_gallery(gallery_name, browser, profile_name):
                 gallery.click()
                 time.sleep(1)
                 if gallery_name == "Fotos da capa":
-                    limit = 2
+                    limit = 3
                     folder_type = 'cover'
                 if gallery_name == "Fotos do perfil":
-                    limit = 2
+                    limit = 3
                     folder_type = 'profile'
                 if gallery_name == "Fotos da linha do tempo":
-                    limit = 2
+                    limit = 35
                 get_pictures_from_gallery(
                     browser, limit, profile_name, folder_type)
                 break
@@ -105,7 +106,7 @@ def get_pictures_from_gallery(browser, limit, profile_name, folder_type):
         try:
             img_url = browser.find_element_by_css_selector(
                 ".spotlight").get_attribute("src")
-            save_img(img_url, "{}_{}{}".format(folder_type, profile_name, str(idx)),
+            save_img(img_url, "{}_{}{}".format(profile_name, folder_type, str(idx)),
                      "./{}".format(profile_name))
             time.sleep(1)
             browser.find_element_by_css_selector("._xlt").click()
