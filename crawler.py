@@ -23,7 +23,7 @@ directory_title = browser.find_elements_by_css_selector(
     ".directory-filtered .title")
 
 profiles_amount = re.search(
-    "(\d+)\s", directory_title[1].text.strip()).group(1)
+    r"(\d+)\s", directory_title[1].text.strip()).group(1)
 
 print(profiles_amount)
 

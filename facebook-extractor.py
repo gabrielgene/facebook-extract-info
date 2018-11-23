@@ -4,10 +4,16 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
+import sys
+import traceback
 import requests
 import os
 import re
 import time
+
+profile_galery = "Profile Pictures"
+cover_galery = "Cover Photos"
+timeline_galery = "Timeline Photos"
 
 
 def remove_cta(browser):
@@ -31,7 +37,6 @@ def save_img(img_url, img_name, path):
 def get_about_info(browser, profile_url, profile_name):
     print("Getting about page...")
     path = "./{}".format(profile_name)
-    main_url = "https://www.facebook.com/pg/bandadexysoficial/about/"
     browser.get("{}about".format(profile_url))
     print("Getting about data...")
     data = browser.find_element_by_css_selector("#content_container").text
@@ -74,14 +79,14 @@ def get_gallery(gallery_name, browser, profile_name):
             try:
                 gallery.click()
                 time.sleep(1)
-                if gallery_name == "Fotos da capa":
+                if gallery_name == cover_galery:
                     limit = 3
                     folder_type = 'cover'
-                if gallery_name == "Fotos do perfil":
+                if gallery_name == profile_galery:
                     limit = 3
                     folder_type = 'profile'
-                if gallery_name == "Fotos da linha do tempo":
-                    limit = 35
+                if gallery_name == timeline_galery:
+                    limit = 3
                 get_pictures_from_gallery(
                     browser, limit, profile_name, folder_type)
                 break
@@ -122,7 +127,29 @@ chrome_options.add_argument("no-sandbox")
 print("Create browser")
 browser = webdriver.Chrome('./chromedriver', options=chrome_options)
 
+# "https://www.facebook.com/academiademusicadaramada/",
+# "https://www.facebook.com/Academia-Novas-Letras-132238550261694/",
+# "https://www.facebook.com/ACULMA-Associa%C3%A7%C3%A3o-para-o-Desenvolvimento-Cultural-e-Social-de-Marvila-169624633190969/",
+# "https://www.facebook.com/P%C3%A1gina-Clave-e-Som-1736907746581102/",
+# "https://www.facebook.com/Centromusicaldecascais/",
 profiles = [
+    "https://www.facebook.com/academia.artmusica/",
+    "https://www.facebook.com/AcademiaMusicaBloom/",
+    "https://www.facebook.com/Academia-de-Amadores-de-M%C3%BAsica-182910379897/",
+    "https://www.facebook.com/balanco.criativo/",
+    "https://www.facebook.com/Academia-de-Musica-da-Gra%C3%A7a-166753623380689/",
+    "https://www.facebook.com/academiamusicalisboa/",
+    "https://www.facebook.com/academiademusicadetelheiras/",
+    "https://www.facebook.com/academiamusicadesafios/",
+    "https://www.facebook.com/improviso/",
+    "https://www.facebook.com/ACADEMIA-DE-SANTO-AMARO-263757036989069/",
+    "https://www.facebook.com/escolademusicaacademiadosom/",
+    "https://www.facebook.com/Academia-Luz-Som-458803577535653/",
+    "https://www.facebook.com/Sons.e.Compassos/",
+    "https://www.facebook.com/altamusicalisboa/",
+    "https://www.facebook.com/Centromusicaldecascais/",
+    "https://www.facebook.com/P%C3%A1gina-Clave-e-Som-1736907746581102/",
+    "https://www.facebook.com/CompassoDivertido/",
     "https://www.facebook.com/djpetethazouk/",
     "https://www.facebook.com/KURADJ/",
     "https://www.facebook.com/djvascoamaral/",
@@ -155,13 +182,13 @@ profiles = [
     "https://www.facebook.com/edduoffcial/"
 ]
 
-galleries = ["Fotos da capa", "Fotos do perfil", "Fotos da linha do tempo"]
+galleries = [cover_galery, profile_galery, timeline_galery]
 
 for p in profiles:
     try:
         start_time = time.time()
 
-        profile_name = re.search("\.com\/(\w+.+)\/", p).group(1)
+        profile_name = re.search(r"\.com\/(\w+.+)\/", p).group(1)
         print("Getting profile: {}".format(p))
         if not os.path.exists("profiles/{}".format(profile_name)):
             os.makedirs("profiles/{}".format(profile_name))
@@ -171,6 +198,8 @@ for p in profiles:
             get_gallery(gallery_name, browser, profile_name)
         get_about_info(browser, p, profile_name)
         print("--- %s seconds ---" % (time.time() - start_time))
-    except Exception:
+    except Exception as err:
+        print(err)
+        traceback.print_exc(file=sys.stdout)
         print("Error on profile: {}".format(p))
 browser.close()
